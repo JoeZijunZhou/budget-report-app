@@ -1,6 +1,6 @@
 
-// buget controller
-var bugetController = (function () {
+// budget controller
+var budgetController = (function () {
 
   // expense object/class constructor
   var Expense = function (id, description, value) {
@@ -24,8 +24,18 @@ var bugetController = (function () {
     totals: {
       exp: 0,
       inc: 0
-    }
+    },
+    budget: 0,
+    percentage: -1
   };
+
+  var calculateTotal = function (type) {
+    var sum = 0;
+    data.allItems[type].forEach(function (cur) {
+      sum = sum + cur.value;
+    });
+    data.totals[type] = sum;
+  }
 
   // return object
   return {
@@ -50,6 +60,30 @@ var bugetController = (function () {
 
       // return new item object
       return newItem;
+    },
+    // calculate total budget and percentage
+    calculateBudget: function () {
+      //calculate total expense and income
+      calculateTotal('exp');
+      calculateTotal('inc');
+      //calculate budget: income - expense
+      data.budget = data.totals.inc - data.totals.exp;
+      //calculate percentage: expense/income
+      if (data.totals.inc === 0) {
+        data.percentage = -1;
+      } else {
+        data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+      }
+
+    },
+    // get total budget and percentage
+    getBudget: function () {
+      return {
+        budget: data.budget,
+        totalInc: data.totals.inc,
+        totalExp: data.totals.exp,
+        percentage: data.percentage
+      }
     },
     // testing method
     testing: function () {
@@ -139,7 +173,7 @@ var UIController = (function () {
 })();
 
 // global app controller
-var controller = (function (bugetCtrl, UICtrl) {
+var controller = (function (budgetCtrl, UICtrl) {
 
   // init event listener for all event -- highest level
   var setupEventListeners = function () {
@@ -158,10 +192,13 @@ var controller = (function (bugetCtrl, UICtrl) {
   }
 
   var updateBudget = function () {
+    var budget;
     // calculate total budget
-
+    budgetCtrl.calculateBudget();
     // return budget
-
+    budget = budgetCtrl.getBudget();
+    console.log(budget);
+    
     // display budget on UI
 
   };
@@ -176,7 +213,7 @@ var controller = (function (bugetCtrl, UICtrl) {
 
     if (input.description !== "" && !isNaN(input.value) && input.value > 0) {
       // add item to budget controller - store input data
-      newItem = bugetCtrl.addItem(input.type, input.description, input.value);
+      newItem = budgetCtrl.addItem(input.type, input.description, input.value);
       // add item to UI controller
       UICtrl.addListItem(newItem, input.type);
       // clear input fields
@@ -197,6 +234,6 @@ var controller = (function (bugetCtrl, UICtrl) {
     }
   }
 
-})(bugetController, UIController);
+})(budgetController, UIController);
 
 controller.init();
