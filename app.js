@@ -61,6 +61,22 @@ var budgetController = (function () {
       // return new item object
       return newItem;
     },
+    // delete item method
+    deleteItem: function (type, id) {
+      var ids, index;
+      // elements in allItems[type] are all inc/exp objects
+      // need to get ids in these objects
+      ids = data.allItems[type].map(function (curVal) {
+        return curVal.id;
+      });
+      // get idex of ids array
+      index = ids.indexOf(id);
+
+      if (index !== -1) {
+        data.allItems[type].splice(index, 1);
+      }
+
+    },
     // calculate total budget and percentage
     calculateBudget: function () {
       //calculate total expense and income
@@ -259,10 +275,10 @@ var controller = (function (budgetCtrl, UICtrl) {
       // parse type and ID 'inc-1'
       parseID = itemID.split('-');
       type = parseID[0];
-      ID = parseID[1];
+      ID = parseInt(parseID[1]);
       
       // delete item from data structure
-
+      budgetCtrl.deleteItem(type, ID);
       // delete item from UI
 
       // update&display budget
