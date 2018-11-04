@@ -103,7 +103,11 @@ var UIController = (function () {
     inputValue: '.add__value',
     inputBtn: '.add__btn',
     expensesContainer: '.expenses__list',
-    incomeContainer: '.income__list'
+    incomeContainer: '.income__list',
+    budgetLabel: '.budget__value',
+    incomeLabel: '.budget__income--value',
+    expensesLabel: '.budget__expenses--value',
+    percentageLabel: '.budget__expenses--percentage'
   };
 
   // return object
@@ -164,6 +168,19 @@ var UIController = (function () {
       // cursor focus on description class
       fieldArr[0].focus();
     },
+    // display budget and percentage
+    displayBudget: function (obj) {
+      // set DOM label/UI value
+      document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;
+      document.querySelector(DOMstrings.expensesLabel).textContent = obj.totalExp;
+      document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
+      // display % sign or ---
+      if (obj.percentage <= 0) {
+        document.querySelector(DOMstrings.percentageLabel).textContent = '---';
+      } else {
+        document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%';
+      }
+    },
     // get DOM strings method
     getDOMstrings: function () {
       return DOMstrings;
@@ -198,9 +215,8 @@ var controller = (function (budgetCtrl, UICtrl) {
     // return budget
     budget = budgetCtrl.getBudget();
     console.log(budget);
-    
     // display budget on UI
-
+    UICtrl.displayBudget(budget);
   };
 
   // add item callback function
@@ -230,6 +246,14 @@ var controller = (function (budgetCtrl, UICtrl) {
     // controller init method - listenting to all event
     init: function () {
       console.log('event listener starts!');
+      // init UI display
+      UICtrl.displayBudget({
+        budget: 0,
+        totalInc: 0,
+        totalExp: 0,
+        percentage: -1
+      });
+      // set up all event listener
       setupEventListeners();
     }
   }
