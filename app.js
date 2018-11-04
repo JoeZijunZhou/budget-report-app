@@ -107,7 +107,8 @@ var UIController = (function () {
     budgetLabel: '.budget__value',
     incomeLabel: '.budget__income--value',
     expensesLabel: '.budget__expenses--value',
-    percentageLabel: '.budget__expenses--percentage'
+    percentageLabel: '.budget__expenses--percentage',
+    container: '.container'
   };
 
   // return object
@@ -126,7 +127,7 @@ var UIController = (function () {
       // create HTMl strings with placeholder text
       if (type === 'exp') {
         element = DOMstrings.expensesContainer;
-        html = '<div class="item clearfix" id="expense-%id%">\
+        html = '<div class="item clearfix" id="exp-%id%">\
                     <div class="item__description">%description%</div>\
                     <div class="right clearfix">\
                         <div class="item__value">%value%</div>\
@@ -138,7 +139,7 @@ var UIController = (function () {
                 </div>';
       } else {
         element = DOMstrings.incomeContainer;
-        html = '<div class="item clearfix" id="income-%id%">\
+        html = '<div class="item clearfix" id="inc-%id%">\
                     <div class="item__description">%description%</div>\
                     <div class="right clearfix">\
                         <div class="item__value">%value%</div>\
@@ -206,6 +207,11 @@ var controller = (function (budgetCtrl, UICtrl) {
         ctrlAddItem();
       }
     });
+
+    // delete an item event handler
+    // listen to Lowest common ancester(LCA) of the delete items
+    document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
+
   }
 
   var updateBudget = function () {
@@ -240,6 +246,31 @@ var controller = (function (budgetCtrl, UICtrl) {
     }
 
   }
+
+  // delete item callback function
+  var ctrlDeleteItem = function (event) {
+    var itemID;
+
+    // DOM traversal to find target element
+    itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
+    console.log(itemID);
+    
+    if (itemID) {
+      // parse type and ID 'inc-1'
+      parseID = itemID.split('-');
+      type = parseID[0];
+      ID = parseID[1];
+      
+      // delete item from data structure
+
+      // delete item from UI
+
+      // update&display budget
+
+    }
+
+    
+  };
 
   // return object
   return {
