@@ -7,7 +7,22 @@ var budgetController = (function () {
     this.id = id;
     this.description = description;
     this.value = value;
+    this.percentage = -1;
   }
+  // use prototype to add method to exp object/class
+  Expense.prototype.calculatePercentage = function (totalIncome) {
+    if (totalIncome > 0) {
+      this.percentage = Math.round((this.value / totalIncome) * 100);
+    } else {
+      this.percentage = -1;
+    }
+
+  };
+  
+  Expense.prototype.getPercentage = function () {
+    return this.percentage;
+  };
+
   // income object/class constructor
   var Income = function (id, description, value) {
     this.id = id;
@@ -92,6 +107,12 @@ var budgetController = (function () {
       }
 
     },
+    // calculate percentages
+    calculatePercentages: function () {
+      data.allItems.exp.forEach(function (cur) {
+        cur.calculatePercentage(data.totals.inc);
+      });
+    },
     // get total budget and percentage
     getBudget: function () {
       return {
@@ -101,7 +122,14 @@ var budgetController = (function () {
         percentage: data.percentage
       }
     },
-    // testing method
+    // get percentages
+    getPercentages: function () {
+      var allPerc = data.allItems.exp.map(function (cur) {
+        return cur.getPercentage();
+      });
+      return allPerc;
+    },
+    // testing method - check data
     testing: function () {
       console.log(data);
     }
@@ -235,7 +263,7 @@ var controller = (function (budgetCtrl, UICtrl) {
     // listen to Lowest common ancester(LCA) of the delete items
     document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
 
-  }
+  };
 
   var updateBudget = function () {
     var budget;
@@ -246,6 +274,18 @@ var controller = (function (budgetCtrl, UICtrl) {
     console.log(budget);
     // display budget on UI
     UICtrl.displayBudget(budget);
+  };
+
+  // update percentages
+  var updatePercentages = function () {
+    // calculate percentages
+    budgetCtrl.calculatePercentages();
+    // read percentages from budget controller
+    var percentages = budgetCtrl.getPercentages();
+    console.log(percentages);
+    
+    // update&diaplay new percentages
+
   };
 
   // add item callback function
@@ -263,12 +303,13 @@ var controller = (function (budgetCtrl, UICtrl) {
       UICtrl.addListItem(newItem, input.type);
       // clear input fields
       UICtrl.clearFields();
-      // calculate & update budget
+      // calculate & display & update budget
       updateBudget();
-      // display budget on UI
+      // calculate & update percentages
+      updatePercentages();
     }
 
-  }
+  };
 
   // delete item callback function
   var ctrlDeleteItem = function (event) {
@@ -290,6 +331,8 @@ var controller = (function (budgetCtrl, UICtrl) {
       UICtrl.deleteListItem(itemID);
       // update&display budget
       updateBudget();
+      // calculate & update percentages
+      updatePercentages();
     }
 
     
