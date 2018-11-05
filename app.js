@@ -173,6 +173,14 @@ var UIController = (function () {
     return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
   };
 
+  // customize iterator forEach for node list
+  var nodeListForEach = function (nodeList, callback) {
+    for (let i = 0; i < nodeList.length; i++) {
+      callback(nodeList[i], i);
+    }
+  };
+
+
   // return object
   return {
     // get input method
@@ -259,13 +267,6 @@ var UIController = (function () {
       var fields = document.querySelectorAll(DOMstrings.expensesPercLabel);
     
       // either change node list to array, then use forEach; or customize forEach for node list
-      // customize iterator forEach for node list
-      var nodeListForEach = function (nodeList, callback) {
-        for (let i = 0; i < nodeList.length; i++) {
-          callback(nodeList[i], i);
-        }
-      };
-
       nodeListForEach(fields, function (curVal, index) {
         if (percentages[index] !== 0) {
           curVal.textContent = percentages[index] + '%'; 
@@ -282,6 +283,19 @@ var UIController = (function () {
       month = now.getMonth();
       year = now.getFullYear();
       document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year;
+    },
+    // change input field color
+    changedType: function () {
+      var fields = document.querySelectorAll(
+        DOMstrings.inputType + ',' +
+        DOMstrings.inputDescription + ',' +
+        DOMstrings.inputValue
+      );
+
+      nodeListForEach(fields, function (curVal) {
+        curVal.classList.toggle('red-focus');
+      });
+      document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
     },
     // get DOM strings method
     getDOMstrings: function () {
@@ -313,6 +327,8 @@ var controller = (function (budgetCtrl, UICtrl) {
     // listen to Lowest common ancester(LCA) of the delete items
     document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
 
+    // change color for exp/inc input fields
+    document.querySelector(DOM.inputType).addEventListener('change', UICtrl.changedType);
   };
 
   var updateBudget = function () {
